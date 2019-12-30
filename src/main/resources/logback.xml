@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+
+	<!-- This should be a system variable injected by depoyment scripts -->
+	<property name="LOGS_HOME" value="logs" />
+	<property name="MIN_INDEX" value="1" />
+	<property name="MAX_INDEX" value="20" />
+	<property name="MAX_FILE_SIZE" value="20MB" />
+
+	<contextListener
+		class="ch.qos.logback.classic.jul.LevelChangePropagator">
+		<resetJUL>true</resetJUL>
+	</contextListener>
+
+	<!-- To enable JMX Management -->
+	<jmxConfigurator />
+
+	<appender name="console"
+		class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m %X{appid}%n
+			</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="file"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOGS_HOME}/suggestion-service.log</file>
+		<append>true</append>
+		<encoder>
+			<pattern
+				class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+				%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1} - %m
+				%X{appid}%n
+			</pattern>
+		</encoder>
+
+
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>${LOGS_HOME}/archived/suggestion_log.%i.log
+			</fileNamePattern>
+			<minIndex>${MIN_INDEX}</minIndex>
+			<maxIndex>${MAX_INDEX}</maxIndex>
+		</rollingPolicy>
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<maxFileSize>${MAX_FILE_SIZE}</maxFileSize>
+		</triggeringPolicy>
+
+	</appender>
+
+
+	<logger name="com.coveo.suggestionservice" level="debug"
+		additivity="false">
+		<appender-ref ref="console" />
+	</logger>
+
+	<logger
+		name="org.springframework.data.elasticsearch.client.WIRE"
+		level="trace">
+		<appender-ref ref="console" />
+	</logger>
+
+	<root level="info">
+		<appender-ref ref="console" />
+		<appender-ref ref="file" />
+		<!-- <appender-ref ref="SIFT" /> -->
+	</root>
+
+
+</configuration>
