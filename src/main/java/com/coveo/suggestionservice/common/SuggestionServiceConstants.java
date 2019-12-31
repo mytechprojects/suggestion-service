@@ -13,7 +13,7 @@ public class SuggestionServiceConstants
 
 	public static final String SERVICE_ERROR = "SUGGESTION_SVC";
 
-	public static final String VALID_API_KEY = "suggestion";
+	public static final String VALID_API_KEY = "SUGGESTION-SERVICE-APIKEY";
 	
 	public static final String LONGITUDE = "longitude";
 	
