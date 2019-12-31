@@ -12,8 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.coveo.suggestionservice.SuggestionServiceApplication;
-import com.coveo.suggestionservice.component.GeoScorer;
 import com.coveo.suggestionservice.component.IndexBuilder;
+import com.coveo.suggestionservice.component.ScoringEngine;
 import com.coveo.suggestionservice.model.GeoMatch;
 import com.coveo.suggestionservice.model.GeoName;
 import com.coveo.suggestionservice.model.SuggestionResponse;
@@ -25,7 +25,10 @@ public class SuggestionService
 	public Logger logger = LoggerFactory.getLogger(SuggestionServiceApplication.class);
 	
 	@Autowired
-	IndexBuilder geoIndexBuilder;	
+	IndexBuilder geoIndexBuilder;
+	
+	@Autowired
+	ScoringEngine scoringEngine;	
 
 	//@Override
 	public SuggestionResponse getSuggestions(UserRequest userRequest)
@@ -58,7 +61,9 @@ public class SuggestionService
 		//if coordinates specified, then fine tune the score
 		if(null!= userRequest.getLatitude())
 		{
-			GeoScorer.scoreBasedOnCoordinates(geoMatchesList, userRequest.getLatitude(), userRequest.getLongitude());
+			geoMatchesList.forEach(
+									aGeoMatch -> aGeoMatch.setScore(scoringEngine.calculateScore(aGeoMatch, userRequest.getLatitude(), userRequest.getLongitude()))
+								  );
 		}
 		// Sort results based on score
 		Collections.sort(geoMatchesList, Collections.reverseOrder());
