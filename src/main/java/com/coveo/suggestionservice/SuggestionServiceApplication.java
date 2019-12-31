@@ -93,7 +93,7 @@ public class SuggestionServiceApplication {
 		{
 			end = Instant.now();
 			logger.info("Time taken to service request. Response time (mS) = " + Duration.between(start, end).toMillis());
-			throw new SuggestionServiceException(SuggestionServiceConstants.SERVICE_ERROR, e.getClass().getName(), e.getMessage());
+			throw new SuggestionServiceException(SuggestionServiceConstants.SERVICE_ERROR, e.getClass().getName(), e.toString());
 		}
 		logger.info("Time taken to service request. Response time (mS) = " + Duration.between(start, end).toMillis());
 		return new ResponseEntity<>(suggestionResponse,HttpStatus.OK);

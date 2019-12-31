@@ -1,138 +1,63 @@
 package com.coveo.suggestionservice;
 
-import java.util.Map;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.web.servlet.error.ErrorAttributes;
-import org.springframework.boot.web.servlet.error.ErrorController;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import com.coveo.suggestionservice.common.SuggestionServiceConstants;
+import com.coveo.suggestionservice.common.SuggestionAPIError;
+import com.coveo.suggestionservice.common.SuggestionServiceException;
 
-public class GlobalErrorRestManager implements ErrorController
-{
-	static {
-		LoggerFactory.getLogger(GlobalErrorRestManager.class);
-	}
-	/**
-	 * Error Attributes in the Application
-	 */
-	private ErrorAttributes errorAttributes;
+@Order(Ordered.HIGHEST_PRECEDENCE)
+@ControllerAdvice
+public class GlobalErrorHandler extends ResponseEntityExceptionHandler {
 
-	private final static String ERROR_PATH = "/error";
+    /**
+     * Handle MissingServletRequestParameterException. Triggered when a 'required' request parameter is missing.
+     *
+     * @param ex      MissingServletRequestParameterException
+     * @param headers HttpHeaders
+     * @param status  HttpStatus
+     * @param request WebRequest
+     * @return the SuggestionAPIError object
+     */
+    @Override
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(
+            MissingServletRequestParameterException ex, HttpHeaders headers,
+            HttpStatus status, WebRequest request) {
+        String error = ex.getParameterName() + " parameter is missing";
+        return buildResponseEntity(new SuggestionAPIError(BAD_REQUEST, error, ex));
+    }
+    
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    protected ResponseEntity<Object> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex,
+                                                                      WebRequest request) {
+    	SuggestionAPIError apiError = new SuggestionAPIError(BAD_REQUEST);
+        apiError.setMessage(String.format("The parameter '%s' of value '%s' could not be converted to type '%s'", ex.getName(), ex.getValue(), ex.getRequiredType().getSimpleName()));
+        apiError.setDebugMessage(ex.getMessage());
+        return buildResponseEntity(apiError);
+    }
+    
+    @ExceptionHandler(SuggestionServiceException.class)
+    protected ResponseEntity<Object> handleSuggestionException(SuggestionServiceException ex,
+                                                                      WebRequest request) {
+    	SuggestionAPIError apiError = new SuggestionAPIError(BAD_REQUEST);
+    	apiError.setMessage("Suggestion Service encountered exception ");
+    	apiError.setDebugMessage(ex.getMessage());
+        return buildResponseEntity(apiError);
+    }
 
-	/**
-	 * Controller for the Error Controller
-	 * 
-	 * @param errorAttributes
-	 */
-	public GlobalErrorRestManager(ErrorAttributes errorAttributes)
+	private ResponseEntity<Object> buildResponseEntity(SuggestionAPIError suggestionAPIError)
 	{
-		this.errorAttributes = errorAttributes;
+		return new ResponseEntity<>(suggestionAPIError, suggestionAPIError.getStatus());
 	}
-
-	/**
-	 * Supports the HTML Error View
-	 * 
-	 * @param request
-	 * @return
-	 */
-	@RequestMapping(value = ERROR_PATH, produces = "text/html")
-	public ModelAndView errorHtml(HttpServletRequest request)
-	{
-		return new ModelAndView("/globalerror", getErrorAttributes(request, false));
-
-		/*
-		 * Velocity seems to have been deprecated in the new spring version. In case this redirection doesn't work.. we can use direct response like below.
-		 * 
-		 * String customMessage = (String)getErrorAttributes(request, false).get(SuggestionServiceConstants.GLOBAL_ERRORRESPONSE_MESSAGE); Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code"); Exception exception = (Exception) request.getAttribute("javax.servlet.error.exception"); return String.format("<html><body><h2>Error Page</h2><div>Status code: <b>%s</b></div>" + "<div>Exception Message: <b>%s</b></div><body></html>", statusCode, customMessage);
-		 */
-	}
-
-	/**
-	 * Supports other formats like JSON, XML
-	 * 
-	 * @param request
-	 * @return
-	 */
-	@RequestMapping(value = ERROR_PATH)
-	@ResponseBody
-	public ResponseEntity<Map<String, Object>> error(HttpServletRequest request)
-	{
-		Map<String, Object> body = getErrorAttributes(request, getTraceParameter(request));
-		HttpStatus status = getStatus(request);
-		return new ResponseEntity<Map<String, Object>>(body, status);
-	}
-
-	/**
-	 * Returns the path of the error page.
-	 *
-	 * @return the error path
-	 */
-	@Override
-	public String getErrorPath()
-	{
-		return ERROR_PATH;
-	}
-
-	private boolean getTraceParameter(HttpServletRequest request)
-	{
-		String parameter = request.getParameter("trace");
-		if (parameter == null)
-		{
-			return false;
-		}
-		return !"false".equals(parameter.toLowerCase());
-	}
-
-	private Map<String, Object> getErrorAttributes(HttpServletRequest request, boolean includeStackTrace)
-	{
-		RequestAttributes requestAttributes = new ServletRequestAttributes(request);
-		requestAttributes.getAttributeNames(0);
-		Map<String, Object> responseAttributes = this.errorAttributes.getErrorAttributes((WebRequest) request, includeStackTrace);
-
-		// Hook method to insert / modify default error response attributes
-		prepareCustomErrorAttributes(responseAttributes);
-		return responseAttributes;
-	}
-
-	private void prepareCustomErrorAttributes(Map<String, Object> responseAttributes)
-	{
-		try
-		{
-			// By default, these attributes expose internal information
-			responseAttributes.remove(SuggestionServiceConstants.GLOBAL_ERRORRESPONSE_EXCEPTION);
-			String defaultErrorResponse = SuggestionServiceConstants.GLOBAL_ERRORRESPONSE_DEFAULTTEXT;
-
-			responseAttributes.put(SuggestionServiceConstants.GLOBAL_ERRORRESPONSE_MESSAGE, defaultErrorResponse);
-		} catch (Exception ex)
-		{
-
-		}
-	}
-
-	private HttpStatus getStatus(HttpServletRequest request)
-	{
-		Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
-		if (statusCode != null)
-		{
-			try
-			{
-				return HttpStatus.valueOf(statusCode);
-			} catch (Exception ex)
-			{
-			}
-		}
-		return HttpStatus.INTERNAL_SERVER_ERROR;
-	}
-
 }
