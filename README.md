@@ -42,13 +42,14 @@ The solution has been implemented using Springboot on Java 8.  The solution has 
 3. Web Layer: Exposes the suggestion endpoint as a REST API
 
 
-### Feature Summary
-1.Protected REST endpoint: To demonstrate API level security, i have introduced a header (X-API-KEY).  This header can be used to hook into a authentication layer. For the demo purpose, the only valid X-API-KEY will be SUGGESTION-SERVICE-APIKEY (specifed in the Constants file)
-2. Personalization hook: Incoming request can be enriched by adding attributes to the RequestContext. The UserRequest class can be used for this.
-3. Index Build on startup:  I have leveraged the Spring event model to ensure that the index is built on the service startup.  Since the service cannot function without a valid index datastructure, any errors in this process will cause a System exit. 
-4. Index maintenance hook:  In a production scenario, there could be situations that demand index maintenance.  During such instances, the index ready boolean can be utilized to either return a temporary response or Out of Service kind of response
-5. Pluggable Scoring Engine:  I have implemented a simple scoring engine that depends on the query match first followed by geo-graphic proximity.  We can obviously think of much more complicated scoring algorithms.  The interface plugging approach will allow for easier integration with any other scoring engine.
+### Feature Summary & Highlights      
+1.Modularized and Object Oriented Approach
+2. Protected REST endpoint: To demonstrate API level security, i have introduced a header (X-API-KEY).  This header can be used to hook into a authentication layer. For the demo purpose, the only valid X-API-KEY will be SUGGESTION-SERVICE-APIKEY (specifed in the Constants file)
+3. Personalization hook: Incoming request can be enriched by adding attributes to the RequestContext. The UserRequest class can be used for this.  
+4. Index Build on startup:  I have leveraged the Spring event model to ensure that the index is built on the service startup.  Since the service cannot function without a valid index datastructure, any errors in this process will cause a System exit.   
+5. Index maintenance hook:  In a production scenario, there could be situations that demand index maintenance.  During such instances, the index ready boolean can be utilized to either return a temporary response or Out of Service kind of response.  
+6. Pluggable Scoring Engine:  I have implemented a simple scoring engine that depends on the query match first followed by geo-graphic proximity.  We can obviously think of much more complicated scoring algorithms.  The interface plugging approach will allow for easier integration with any other scoring engine.
 ### Assumptions
-  - In-depth data validation
+  - In-depth data validation has been skipped and i have assumed that the data format specified in the GeoName Readme is accurate
 #### Online Markdown Editor
 See [Markdown Editor](https://dillinger.io/)
