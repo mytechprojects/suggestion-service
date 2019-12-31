@@ -31,6 +31,8 @@ import com.coveo.suggestionservice.utils.DataValidationUtil;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
@@ -53,6 +55,11 @@ public class SuggestionServiceApplication {
 	
 	@RequestMapping(method = { RequestMethod.GET}, value = "/suggestions", produces = "application/json")
 	@ApiOperation(value = "Get suggestions", httpMethod="GET", notes="Obtain suggestions based on city and latitude / longitude params")
+	@ApiResponses(value = { 
+		    @ApiResponse(code = 200, message = "Ok"),
+		    @ApiResponse(code = 400, message = "Bad request"),
+		    @ApiResponse(code = 401, message = "Unauthorized"),
+		    @ApiResponse(code = 500, message = "Unexpected error") })	
 	public @ResponseBody ResponseEntity<?> getSuggestions(HttpServletResponse response, 
 			@ApiParam(name="X-API-Key",  value="X-API-Key", required=true)
 			@RequestHeader(value="X-API-Key") String apiKey,
