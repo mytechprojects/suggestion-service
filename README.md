@@ -58,5 +58,6 @@ The solution has been implemented using Springboot on Java 8.  The solution has 
 6. Pluggable Scoring Engine:  I have implemented a simple scoring engine that depends on the query match first followed by geo-graphic proximity.  We can obviously think of much more complicated scoring algorithms.  The interface plugging approach will allow for easier integration with any other scoring engine.
 ### Assumptions
   - In-depth data validation has been skipped and i have assumed that the data format specified in the GeoName Readme is accurate
+  - User input validation is minimal.  This can be enhanced (For eg. check if the passed latitude / longitude is valid 
 #### Online Markdown Editor
 See [Markdown Editor](https://dillinger.io/)
