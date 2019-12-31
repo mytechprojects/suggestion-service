@@ -11,6 +11,6 @@ import com.coveo.suggestionservice.model.GeoMatch;
  */
 public interface ScoringEngine
 {
-	public void calculateScore(GeoMatch geo, Float latitude, Float longitude);
+	public double calculateScore(GeoMatch geo, Float latitude, Float longitude);
 
 }

@@ -1,11 +1,12 @@
 package com.coveo.suggestionservice.component;
 
-import java.util.List;
+import org.springframework.stereotype.Component;
 
 import com.coveo.suggestionservice.model.GeoMatch;
 import com.coveo.suggestionservice.utils.GeoUtil;
 
-public class GeoScorer
+@Component
+public class GeoScorer implements ScoringEngine
 {
 
 	// Maximum distance between 2 points
@@ -14,17 +15,13 @@ public class GeoScorer
 	// Tweak this parameter to see higher difference between scores
 	private static final double WEIGHT = 10;
 
-	public static void scoreBasedOnCoordinates(List<GeoMatch> geoMatchesList, Float latitude, Float longitude)
-	{
-		geoMatchesList.forEach(geo -> calculateScore(geo, latitude, longitude));
-		
-	}
-
-	private static void calculateScore(GeoMatch geo, Float latitude, Float longitude)
+	public double calculateScore(GeoMatch geo, Float latitude, Float longitude)
 	{
 		double distance = GeoUtil.distance(geo.getLatitude(), geo.getLongitude(), latitude, longitude);
 		double decreaseFactor = WEIGHT * (distance / MAX_GEO_DISTANCE);
-		geo.setScore(geo.getScore() - decreaseFactor);  // Further the distance, lesser the score
+		double score = geo.getScore() - decreaseFactor;  // Further the distance, lesser the score
+		
+		return score;
 	}
 
 }
