@@ -19,14 +19,21 @@ For Development, it is recommended to run inside mvn itself using the below comm
 
 ### Configuration
 By default the web application starts on port 8080.  I have checked-in the cities500.txt input file into the project.  By default, the index build uses this input file.
-A much larger input file can be provided as a command line parameter (geodata.file) specifying the absolute file path. 
-**mvn spring-boot:run -Dspring-boot.run.arguments="--geodata.file=/tmp/myfile.txt"**
-I have tried with the biggest file provided by geonames.  (allCountries.txt which is a 1.4G file).  The current index is a full in-memory datastructure.  For optimized index creation and to avoid out of memory errors, please set the following JVM parameters
-**-Xms2G -Xmx4G  -XX:+UseParNewGC**
-The entire command can be summarized as
-**mvn spring-boot:run -Dspring-boot.run.arguments="--geodata.file=/Users/mrajasekha/tmp/allCountries.txt" -Dspring-boot.run.jvmArguments="-Xms2G -Xmx4G  -XX:+UseParNewGC"**
+A much larger input file can be provided as a command line parameter (geodata.file) specifying the absolute file path.   
+ 
+**mvn spring-boot:run -Dspring-boot.run.arguments="--geodata.file=/tmp/myfile.txt"**    
+
+I have tried with the biggest file provided by geonames.  (allCountries.txt which is a 1.4G file).  The current index is a full in-memory datastructure.  For optimized index creation and to avoid out of memory errors, please set the following JVM parameters   
+
+**-Xms2G -Xmx4G  -XX:+UseParNewGC**   
+
+The entire command can be summarized as    
+
+**mvn spring-boot:run -Dspring-boot.run.arguments="--geodata.file=/Users/mrajasekha/tmp/allCountries.txt" -Dspring-boot.run.jvmArguments="-Xms2G -Xmx4G  -XX:+UseParNewGC"**    
+
 
 The whole index creation process for the largest file took about 1.7 minutes average with the above mentioned JVM performance tuning.
+
 ### API Reference
 I have used Swagger to document the REST APIs.  I have also used springfox-swaggerui to include
 the swagger UI that makes it easy to view the REST APIs and even send requests
