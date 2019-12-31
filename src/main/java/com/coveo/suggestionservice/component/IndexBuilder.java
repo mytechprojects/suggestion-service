@@ -46,10 +46,10 @@ public class IndexBuilder
 	
 	public void buildGeoIndex(String inputFile) throws SuggestionServiceException
 	{
-		logger.info("Starting index creation.. ");
+		logger.info("Starting index creation with input file --  " + inputFile);
 		long start = System.currentTimeMillis();
 
-		
+		//try (Stream<String> stream = Files.lines(Paths.get(ClassLoader.getSystemResource(inputFile).toURI())))
 		try (Stream<String> stream = Files.lines(Paths.get(inputFile)))
 		{
 			stream.forEach(line -> populateMap(line));
@@ -57,8 +57,7 @@ public class IndexBuilder
 		} catch (IOException e)
 		{
 			throw new SuggestionServiceException(SuggestionServiceConstants.IOERROR, e.getClass().getName(), e.getMessage());
-		}
-		
+		} 		
 		
 		logger.info("Index Build Time: " + (System.currentTimeMillis() - start) + "ms");
 		logger.info("Size = " + index.size()); 
