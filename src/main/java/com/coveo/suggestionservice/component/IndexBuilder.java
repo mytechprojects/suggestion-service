@@ -20,6 +20,8 @@ import com.google.common.base.Splitter;
 @Component
 public class IndexBuilder
 {
+	public Logger logger = LoggerFactory.getLogger(IndexBuilder.class);
+	
 	MultiValuedMap<String, GeoName> index = new ArrayListValuedHashMap<>(1000000, 5);
 	
 	// Can be used to support usecases like maintenance / index rebuild
@@ -34,8 +36,6 @@ public class IndexBuilder
 	{
 		this.isIndexReady = isIndexReady;
 	}
-
-	public Logger logger = LoggerFactory.getLogger(IndexBuilder.class);
 	
 	Splitter splitter = Splitter.on(SuggestionServiceConstants.FILE_SEPERATOR);
 	
@@ -84,23 +84,4 @@ public class IndexBuilder
 		GeoName geoname = new GeoName(Integer.parseInt(data.get(0)), data.get(1), Float.parseFloat(data.get(4)), Float.parseFloat(data.get(5)), data.get(8), data.get(10));
 		index.put(data.get(1), geoname);
 	}
-	
-	public static void main(String args[])
-	{
-		try
-		{
-			IndexBuilder util = new IndexBuilder();
-			util.buildGeoIndex("/Users/mrajasekha/tmp/allCountries.txt");
-			
-			MultiValuedMap<String, GeoName> geoMap = util.getGeoIndex();
-			geoMap.get("London").stream().forEach(val -> System.out.println(val));
-
-		} catch (SuggestionServiceException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}	
-
 }

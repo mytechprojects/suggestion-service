@@ -1,5 +1,7 @@
 package com.coveo.suggestionservice;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
@@ -12,6 +14,9 @@ import com.coveo.suggestionservice.component.IndexBuilder;
 @Component
 public class SuggestionServiceLoader implements ApplicationListener<ContextRefreshedEvent>
 {
+	
+	public Logger logger = LoggerFactory.getLogger(IndexBuilder.class);
+	
 	@Autowired
 	IndexBuilder geoIndexBuilder;
 	
@@ -26,8 +31,9 @@ public class SuggestionServiceLoader implements ApplicationListener<ContextRefre
 			geoIndexBuilder.buildGeoIndex(inputFile);
 		} catch (SuggestionServiceException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Application startup error: " + e.toString());
+			logger.error("Could not build index. Aborting application startup");
+			System.exit(1);
 		}
 		
 	}
