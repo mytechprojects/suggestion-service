@@ -5,7 +5,7 @@
  - JAVA 8 or higher 
  - Apache Maven 3.3.9 or higher
 ### Development
-The service has been developed on Spring Boot v2.2.2.RELEASE, Spring v5.2.2.RELEASE platform.  Clone the repository and import the project into any Java IDE as an existing maven project
+The service has been developed on Spring Boot v2.2.2.RELEASE, Spring v5.2.2.RELEASE and Junit 4 platform.  Clone the repository and import the project into any Java IDE as an existing maven project
 ### Build and Packaging
 Change into the cloned repository folder and build the project
 ```sh
@@ -50,8 +50,10 @@ The solution has been implemented using Springboot on Java 8.  The solution has 
 
 
 ### Feature Summary & Highlights      
-1.Modularized and Object Oriented Approach
-2. Protected REST endpoint: To demonstrate API level security, i have introduced a header (X-API-KEY).  This header can be used to hook into a authentication layer. For the demo purpose, the only valid X-API-KEY will be SUGGESTION-SERVICE-APIKEY (specifed in the Constants file)
+1.Modularized and Object Oriented Approach   
+
+2. Protected REST endpoint: To demonstrate API level security, i have introduced a header (X-API-KEY).  This header can be used to hook into a authentication layer. For the demo purpose, the only valid X-API-KEY will be SUGGESTION-SERVICE-APIKEY (specifed in the Constants file)   
+
 3. Personalization hook: Incoming request can be enriched by adding attributes to the RequestContext. The UserRequest class can be used for this.  
 4. Index Build on startup:  I have leveraged the Spring event model to ensure that the index is built on the service startup.  Since the service cannot function without a valid index datastructure, any errors in this process will cause a System exit.   
 5. Index maintenance hook:  In a production scenario, there could be situations that demand index maintenance.  During such instances, the index ready boolean can be utilized to either return a temporary response or Out of Service kind of response.  
