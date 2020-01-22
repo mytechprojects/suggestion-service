@@ -63,7 +63,7 @@ public class SuggestionServiceApplication {
 	public @ResponseBody ResponseEntity<?> getSuggestions(HttpServletResponse response, 
 			@ApiParam(name="X-API-Key",  value="X-API-Key", required=true)
 			@RequestHeader(value="X-API-Key") String apiKey,
-			@ApiParam(name="query",  value="query", required=true)
+			@ApiParam(name="q",  value="query", required=true)
 			@RequestParam(value="q") String query,
 			@ApiParam(name="latitude",  value="latitude", required=false)
 			@RequestParam(value="latitude", required = false) String latitude,

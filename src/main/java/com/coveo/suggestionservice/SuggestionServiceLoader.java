@@ -8,6 +8,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
+import com.coveo.suggestionservice.common.SuggestionServiceConstants;
 import com.coveo.suggestionservice.common.SuggestionServiceException;
 import com.coveo.suggestionservice.component.IndexBuilder;
 
@@ -21,14 +22,33 @@ public class SuggestionServiceLoader implements ApplicationListener<ContextRefre
 	IndexBuilder geoIndexBuilder;
 	
     @Value("${geodata.file:/tmp/cities500.txt}")
-    private String inputFile;	
+    private String inputFile;
+    
+    @Value("${spring.application.platform:local}")
+    private String appMode;    
+    
+    // Better to inject as environment variables via deployment scripts 
+    @Value("${aws.accessKey.id}")
+    private String accessKeyID;  
+    
+    @Value("${aws.accessKey.secret}")
+    private String accessKey;
+    
+    @Value("${aws.s3.bucket.name}")
+    private String bucketName;
 	
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent arg0)
 	{
 		try
 		{
-			geoIndexBuilder.buildGeoIndex(inputFile);
+			if(SuggestionServiceConstants.AWSDEPLOYPLATFORM.equalsIgnoreCase(appMode)) {
+				geoIndexBuilder.buildGeoIndexFromAWS(accessKeyID, accessKey, bucketName, inputFile);
+			}
+			else
+			{
+				geoIndexBuilder.buildGeoIndex(inputFile);
+			}
 		} catch (SuggestionServiceException e)
 		{
 			logger.error("Application startup error: " + e.toString());
