@@ -1,10 +1,10 @@
 package com.coveo.suggestionservice.component;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
@@ -48,23 +48,25 @@ public class IndexBuilder
 	{
 		logger.info("Starting index creation with input file --  " + inputFile);
 		long start = System.currentTimeMillis();
-
-		//try (Stream<String> stream = Files.lines(Paths.get(ClassLoader.getSystemResource(inputFile).toURI())))
-		try (Stream<String> stream = Files.lines(Paths.get(inputFile)))
+		InputStream is = getClass().getClassLoader().getResourceAsStream(inputFile);
+		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+		String line;
+		try
 		{
-			stream.forEach(line -> populateMap(line));
-
+			while(( line = br.readLine() ) != null)
+			{
+				populateMap(line);
+			}
 		} catch (IOException e)
 		{
 			throw new SuggestionServiceException(SuggestionServiceConstants.IOERROR, e.getClass().getName(), e.getMessage());
-		} 		
-		
+		}
+
 		logger.info("Index Build Time: " + (System.currentTimeMillis() - start) + "ms");
 		logger.info("Size = " + index.size()); 
 		isIndexReady = true;
 		System.gc();
 	}
-
 
 	private void populateMap(String line)
 	{
