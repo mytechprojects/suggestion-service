@@ -22,6 +22,8 @@ public class SuggestionServiceConstants
 	public static final String FILE_SEPERATOR = "	";
 
 	public static final String IOERROR = "IO_ERROR";
+	
+	public static final String AWSERROR = "AWS_ERROR";
 
 	public static final String GEONAME_SEPERATOR = ", ";
 

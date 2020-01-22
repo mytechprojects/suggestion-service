@@ -92,11 +92,19 @@ public class IndexBuilder
 		long start = System.currentTimeMillis();
 		logger.info("Starting index creation with input file --  " + inputFile);
 		AWSCredentials credentials = new BasicAWSCredentials(accessKeyID, accessKeySecret);
-
+		
 		// create a client connection based on credentials
 		AmazonS3 s3client = AmazonS3ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion(Regions.US_EAST_1).build();
-
-		S3Object s3object = s3client.getObject(new GetObjectRequest(bucketName, inputFile));
+		S3Object s3object = null;
+		
+		try
+		{	
+			s3object = s3client.getObject(new GetObjectRequest(bucketName, inputFile));
+		}
+		catch(Exception e)
+		{
+			throw new SuggestionServiceException(SuggestionServiceConstants.AWSERROR, e.getClass().getName(), e.getMessage());
+		}
 
 		BufferedReader reader = new BufferedReader(new InputStreamReader(s3object.getObjectContent()));
 		String line;
